@@ -2,28 +2,28 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Hero from "@/components/Hero";
 
-describe("Hero Component", () => {
-  it('renders the main heading "KURWIX ACADEMY"', () => {
+describe("Hero", () => {
+  it('renders "POSITIVE ALIEN" heading', () => {
     render(<Hero />);
-    const heading = screen.getByRole("heading", { name: /KURWIX/i });
+    const heading = screen.getByRole("heading", { name: /POSITIVE/i });
     expect(heading).toBeInTheDocument();
   });
 
-  it('renders the subtitle about architecture', () => {
+  it('renders Monty Python quote', () => {
     render(<Hero />);
-    const subtitle = screen.getByText(/architektury/i);
-    expect(subtitle).toBeInTheDocument();
+    const quote = screen.getByText(/hiszpańskiej inkwizycji/i);
+    expect(quote).toBeInTheDocument();
   });
 
-  it('renders the "START NAUKI" button', () => {
+  it('renders "ROZPOCZNIJ PRZYGODĘ" button', () => {
     render(<Hero />);
-    const button = screen.getByRole("button", { name: /START NAUKI/i });
+    const button = screen.getByRole("button", { name: /ROZPOCZNIJ PRZYGODĘ/i });
     expect(button).toBeInTheDocument();
   });
 
-  it('renders the animated text "CIURALLA"', () => {
+  it("renders jumping aliens", () => {
     render(<Hero />);
-    const animatedText = screen.getByText(/CIURALLA/i);
-    expect(animatedText).toBeInTheDocument();
+    const aliens = screen.getAllByText("👽");
+    expect(aliens.length).toBeGreaterThanOrEqual(3);
   });
 });

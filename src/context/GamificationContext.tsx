@@ -27,8 +27,6 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
     });
   };
 
-  if (!isLoaded) return null; // Unikanie hydracji przed załadowaniem danych
-
   return (
     <GamificationContext.Provider value={{ points, addPoints }}>
       {children}

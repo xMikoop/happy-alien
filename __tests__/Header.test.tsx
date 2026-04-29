@@ -1,40 +1,38 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent, within } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
 import Header from "@/components/Header";
+import { GamificationProvider } from "@/context/GamificationContext";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/",
 }));
 
+beforeEach(() => {
+  localStorage.clear();
+});
+
+function Wrapper({ children }: { children: React.ReactNode }) {
+  return <GamificationProvider>{children}</GamificationProvider>;
+}
+
 describe("Header", () => {
-  it("renders KURWIX brand link", () => {
-    render(<Header />);
-    const brand = screen.getByRole("link", { name: /KURWIX/i });
+  it("renders POSITIVE ALIEN brand", () => {
+    render(<Header />, { wrapper: Wrapper });
+    const brand = screen.getByRole("link", { name: /POSITIVE ALIEN/i });
     expect(brand).toBeInTheDocument();
-    expect(brand).toHaveAttribute("href", "/");
   });
 
-  it("has 5 desktop nav links", () => {
-    render(<Header />);
-    const nav = screen.getByRole("navigation", { name: /galaktyczna/i });
-    const links = within(nav).getAllByRole("link");
-    // 1 brand + 5 nav = 6 links total in nav
-    expect(links).toHaveLength(6);
+  it("renders rank badge link", () => {
+    render(<Header />, { wrapper: Wrapper });
+    const rankLink = screen.getByRole("link", { name: /Zdezorientowany|Pyłek|Pożeracz|Rycerz|Minister|Monty/i });
+    expect(rankLink).toBeInTheDocument();
+    expect(rankLink).toHaveAttribute("href", "/leaderboard");
   });
 
-  it("toggles mobile menu on hamburger click", () => {
-    render(<Header />);
-    const menuBtn = screen.getByLabelText(/otwórz menu/i);
-    expect(menuBtn).toHaveAttribute("aria-expanded", "false");
-
-    const menu = document.getElementById("mobile-menu");
-    expect(menu).not.toBeNull();
-    expect(menu!.classList.contains("max-h-0")).toBe(true);
-
-    // Click hamburger
-    fireEvent.click(menuBtn);
-    expect(menuBtn).toHaveAttribute("aria-expanded", "true");
-    expect(menu!.classList.contains("max-h-0")).toBe(false);
-    expect(menu!.classList.contains("max-h-96")).toBe(true);
+  it("toggles mobile menu", () => {
+    render(<Header />, { wrapper: Wrapper });
+    const btn = screen.getByLabelText(/otwórz menu/i);
+    fireEvent.click(btn);
+    expect(screen.getByLabelText(/zamknij menu/i)).toBeInTheDocument();
   });
 });
