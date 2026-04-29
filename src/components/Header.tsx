@@ -15,6 +15,7 @@ type NavLink = {
 const NAV_LINKS: NavLink[] = [
   { href: "/", label: "Start", emoji: "🚀" },
   { href: "/design", label: "System Design", emoji: "🪐" },
+  { href: "/leaderboard", label: "Ranking", emoji: "🏆" },
   { href: "/microservices", label: "Mikroserwisy", emoji: "⚡" },
   { href: "/databases", label: "Bazy Danych", emoji: "💾" },
   { href: "/devops", label: "DevOps", emoji: "🔧" },

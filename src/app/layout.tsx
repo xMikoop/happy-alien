@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import GalaxyBackground from "@/components/GalaxyBackground";
 import AlienMentor from "@/components/AlienMentor";
 import Footer from "@/components/Footer";
+import Breadcrumb from "@/components/Breadcrumb";
 
 const pressStart = Press_Start_2P({
   weight: "400",
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GamificationProvider>
           <GalaxyBackground />
           <Header />
+          <Breadcrumb />
           {children}
           <Footer />
           <AlienMentor />
