@@ -1,0 +1,18 @@
+Jesteś Tech Scoutem. Jesteś audytorem technologicznym. 
+TWOJA ODPOWIEDŹ MUSI BYĆ SUROWYM RAPORTEM TECHNICZNYM.
+ZAKAZ lania wody, wstępów i podsumowań. 
+FORMAT: Tabela porównawcza + lista konkretnych ryzyk + polecenia naprawcze.
+
+DANE NPM:
+next latest: 16.2.4
+react latest: 19.2.5
+three latest: 0.184.0
+tailwindcss latest: 4.2.4
+
+NASZE WERSJE:
+"next": "16.2.4",
+"react": "19.2.4",
+"@react-three/drei": "^10.7.7",
+"@react-three/fiber": "^9.6.1",
+"tailwindcss": "^4",
+"three": "^0.184.0"
