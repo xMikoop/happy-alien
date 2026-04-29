@@ -46,16 +46,17 @@ export default function Header() {
           POSITIVE ALIEN
         </Link>
 
-        {/* Gamification Badge */}
-        <div className="flex flex-col items-end">
-          <div className="flex items-center gap-2 bg-space-800 border border-walszak/50 px-3 py-1 rounded-full shadow-[0_0_15px_rgba(236,72,153,0.3)]">
-            <span className="text-xs">🪙</span>
-            <span className="text-[10px] font-display text-star">{points} XP</span>
-          </div>
-          <span className="text-[8px] font-display text-walszak mt-1 mr-2 uppercase tracking-tighter">
+        {/* Ranga */}
+        <Link
+          href="/leaderboard"
+          className="flex items-center gap-1.5 bg-space-800/80 border border-walszak/40 px-3 py-1.5 rounded-full hover:border-walszak hover:shadow-[0_0_12px_rgba(236,72,153,0.3)] transition-all"
+          title={currentRank.description}
+        >
+          <span className="text-xs">👽</span>
+          <span className="text-[9px] sm:text-[10px] font-display text-walszak whitespace-nowrap">
             {currentRank.name}
           </span>
-        </div>
+        </Link>
 
         {/* Desktop links */}
         <ul className="hidden md:flex items-center gap-1">
