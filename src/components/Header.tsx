@@ -37,34 +37,36 @@ export default function Header() {
         className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6"
         aria-label="Nawigacja galaktyczna"
       >
-        {/* Brand */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 font-display text-[10px] sm:text-xs text-quasar glow-text hover:scale-105 transition-transform"
-        >
-          <span className="text-base">👽</span>
-          POSITIVE ALIEN
-        </Link>
+        <div className="flex items-center gap-10">
+          {/* Brand */}
+          <Link
+            href="/"
+            className="flex items-center gap-2 font-display text-xs text-quasar glow-text hover:scale-105 transition-transform"
+          >
+            <span className="text-base">👽</span>
+            POSITIVE ALIEN
+          </Link>
 
-        {/* Ranga */}
-        <Link
-          href="/leaderboard"
-          className="flex items-center gap-1.5 bg-space-800/80 border border-walszak/40 px-3 py-1.5 rounded-full hover:border-walszak hover:shadow-[0_0_12px_rgba(236,72,153,0.3)] transition-all"
-          title={currentRank.description}
-        >
-          <span className="text-xs">👽</span>
-          <span className="text-[9px] sm:text-[10px] font-display text-walszak whitespace-nowrap">
-            {currentRank.name}
-          </span>
-        </Link>
+          {/* Ranga */}
+          <Link
+            href="/leaderboard"
+            className="hidden sm:flex items-center gap-1.5 bg-space-800/80 border border-walszak/40 px-4 py-2 rounded-full hover:border-walszak hover:shadow-[0_0_12px_rgba(236,72,153,0.3)] transition-all"
+            title={currentRank.description}
+          >
+            <span className="text-base">👽</span>
+            <span className="font-display text-xs text-walszak whitespace-nowrap">
+              {currentRank.name}
+            </span>
+          </Link>
+        </div>
 
         {/* Desktop links */}
-        <ul className="hidden md:flex items-center gap-1">
+        <ul className="hidden md:flex items-center gap-12">
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
               <Link
                 href={link.href}
-                className={`relative px-3 py-2 text-xs font-display rounded-md transition-all duration-200 ${
+                className={`relative px-4 py-2.5 font-display text-xs rounded-md transition-all duration-200 ${
                   isActive(link.href)
                     ? "text-star bg-space-700/50 glow-text"
                     : "text-zinc-400 hover:text-quasar hover:bg-space-800/50"
@@ -111,7 +113,7 @@ export default function Header() {
               <Link
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-2 px-4 py-3 text-xs font-display rounded-lg transition-all ${
+                className={`flex items-center gap-2 px-4 py-3 font-display text-xs rounded-lg transition-all ${
                   isActive(link.href)
                     ? "bg-space-700 text-star"
                     : "text-zinc-400 hover:bg-space-800 hover:text-quasar"

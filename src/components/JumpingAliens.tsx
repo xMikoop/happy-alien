@@ -3,39 +3,31 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const JumpingAliens = () => {
-  const colors = [
-    'text-red-500',
-    'text-blue-500',
-    'text-green-500',
-    'text-yellow-500',
-    'text-purple-500',
-    'text-pink-500',
-    'text-indigo-500',
-    'text-orange-500',
-    'text-teal-500',
-    'text-cyan-500',
-  ];
+interface JumpingAliensProps {
+  count?: number;
+  size?: "sm" | "md" | "lg";
+}
 
+// Stałe animacje — brak chaosu losowości
+const ALIEN_ANIMATIONS = [
+  { y: [0, -20, 0], x: [0, 5, -5, 0], duration: 1.5 },
+  { y: [0, -15, 0], x: [0, -8, 8, 0], duration: 1.8 },
+  { y: [0, -25, 0], x: [0, 3, -3, 0], duration: 1.2 },
+];
+
+const SIZE_MAP = { sm: "text-2xl", md: "text-4xl", lg: "text-6xl" };
+
+export default function JumpingAliens({ count = 3, size = "md" }: JumpingAliensProps) {
   return (
     <div className="flex justify-center items-center h-full">
-      {[...Array(5)].map((_, index) => {
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        const randomDuration = Math.random() * 2 + 1;
-        
+      {[...Array(count)].map((_, index) => {
+        const anim = ALIEN_ANIMATIONS[index % ALIEN_ANIMATIONS.length];
         return (
           <motion.div
             key={index}
-            className={`text-4xl mx-2 ${randomColor} cursor-default select-none`}
-            animate={{
-              y: [0, -20, 0],
-              x: [0, 10, -10, 0],
-            }}
-            transition={{
-              duration: randomDuration,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
+            className={`${SIZE_MAP[size]} mx-2 text-quasar cursor-default select-none`}
+            animate={{ y: anim.y, x: anim.x }}
+            transition={{ duration: anim.duration, repeat: Infinity, ease: "easeInOut", delay: index * 0.3 }}
           >
             👽
           </motion.div>
@@ -43,6 +35,4 @@ const JumpingAliens = () => {
       })}
     </div>
   );
-};
-
-export default JumpingAliens;
+}
