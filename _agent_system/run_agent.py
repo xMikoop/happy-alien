@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Delegator v4 — agenci z kontekstem przez plik (omija limit command line Windowsa).
+Delegator v5 — agenci sami czytaja pliki przez narzedzia Pi (read/edit/write).
+Omija limit command line Windowsa — nie wstrzykuje kodu, agent czyta sam.
 """
-import argparse, subprocess, sys, time, json, io, os, tempfile
+import argparse, subprocess, sys, time, json, io, os
 from pathlib import Path
 
 HERE = Path(__file__).parent
@@ -18,37 +19,30 @@ PI_CMD = r"C:\Users\mikol\AppData\Roaming\npm\pi.cmd"
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
-CONTEXT_FILES = [
-    "src/app/layout.tsx", "src/app/page.tsx",
-    "src/app/design/page.tsx", "src/app/microservices/page.tsx",
-    "src/app/databases/page.tsx", "src/app/devops/page.tsx",
+# Lista plikow projektu — agent dostaje te sciezki i czyta je sam narzedziem read
+PROJECT_FILES = [
+    "src/app/layout.tsx",
+    "src/app/page.tsx",
+    "src/app/design/page.tsx",
+    "src/app/microservices/page.tsx",
+    "src/app/databases/page.tsx",
+    "src/app/devops/page.tsx",
     "src/app/leaderboard/page.tsx",
-    "src/components/Header.tsx", "src/components/Hero.tsx",
-    "src/components/Footer.tsx", "src/components/AlienMentor.tsx",
-    "src/components/GalaxyBackground.tsx", "src/components/JumpingAliens.tsx",
+    "src/components/Header.tsx",
+    "src/components/Hero.tsx",
+    "src/components/Footer.tsx",
+    "src/components/AlienMentor.tsx",
+    "src/components/GalaxyBackground.tsx",
+    "src/components/JumpingAliens.tsx",
     "src/components/Leaderboard.tsx",
-    "src/context/GamificationContext.tsx", "src/lib/ranks.ts",
-    "src/app/globals.css", "package.json",
+    "src/components/Breadcrumb.tsx",
+    "src/context/GamificationContext.tsx",
+    "src/lib/ranks.ts",
+    "src/app/globals.css",
+    "package.json",
+    "__tests__/",
+    "_agent_system/agents.json",
 ]
-
-def load_context() -> str:
-    parts = []
-    for f in CONTEXT_FILES:
-        path = PROJECT / f
-        if path.exists():
-            try:
-                content = path.read_text(encoding="utf-8")
-                parts.append(f"## {f}\n```\n{content}\n```")
-            except:
-                pass
-    return "\n\n".join(parts)
-
-_context_cache = None
-def get_context() -> str:
-    global _context_cache
-    if _context_cache is None:
-        _context_cache = load_context()
-    return _context_cache
 
 def run_agent(role: str, task: str, model_override: str | None = None) -> dict:
     agent = AGENTS.get(role)
@@ -60,36 +54,36 @@ def run_agent(role: str, task: str, model_override: str | None = None) -> dict:
     short_model = model.split("/")[-1]
     system_prompt_text = prompt_file.read_text(encoding="utf-8").strip()
 
-    # Zapisz kontekst do pliku
-    ctx_file = PROJECT / ".agent_context.txt"
-    ctx_file.write_text(get_context(), encoding="utf-8")
+    files_list = "\n".join(f"  - {PROJECT}/{f}" for f in PROJECT_FILES)
 
-    full_task = f"""PRZECZYTAJ plik .agent_context.txt w katalogu projektu — to aktualny KOD WSZYSTKICH plikow.
+    full_task = f"""Projekt: Positive Alien Academy (Next.js 16, React 19, Tailwind v4, Three.js, Framer Motion)
 
-ZADANIE:
+Lokalizacja projektu: {PROJECT}
+
+PLIKI PROJEKTU (uzyj narzedzia read/edo ich przeczytania):
+{files_list}
+
+=== TWOJE ZADANIE ===
 {task}
 
-WYMAGANIA:
-1. Napisz PEŁNY kod zmienionych plikow (zero skrotow, zero '...reszta bez zmian')
-2. Podaj sciezke pliku przed kazdym blokiem kodu w formacie:
-   ### sciezka/do/pliku.tsx
-   ```tsx
-   ...caly kod...
-   ```
-3. NIE задавай pytan — po prostu napisz kod
-4. Odpowiadaj po polsku"""
+INSTRUKCJE:
+1. Najpierw przeczytaj odpowiednie pliki uzywajac narzedzia read
+2. Napisz ZMIENIONE pliki uzywajac narzedzia write (PELNY kod, zero skrotow)
+3. NIE zadawaj pytan — po prostu czytaj i pisz kod
+4. Jesli narzedzie write nie dziala, wypisz PEŁNY kod z nazwa pliku w odpowiedzi
+5. Odpowiadaj po polsku"""
 
     print(f"\n[{role}] @ {short_model} | {task[:80]}...", file=sys.stderr, flush=True)
 
     cmd = [
-        PI_CMD, "--model", model, "--no-session", "-p",
+        PI_CMD, "--model", model, "-p",
         "--system-prompt", system_prompt_text,
         full_task,
     ]
 
     start = time.time()
     try:
-        r = subprocess.run(cmd, capture_output=True, timeout=180, cwd=str(PROJECT))
+        r = subprocess.run(cmd, capture_output=True, timeout=240, cwd=str(PROJECT))
         elapsed = time.time() - start
 
         output = r.stdout.decode("utf-8", errors="replace").strip()
@@ -98,10 +92,11 @@ WYMAGANIA:
         if r.returncode != 0 or not output:
             msg = f"FAIL (rc={r.returncode}, {elapsed:.1f}s)"
             if error:
-                msg += f": {error[:200]}"
+                msg += f": {error[:300]}"
             print(f"  [{role}] {msg}", file=sys.stderr, flush=True)
             return {"ok": False, "output": f"[BLAD] {msg}", "model": short_model, "time": elapsed}
 
+        # Zapisz raport
         ts = time.strftime("%Y%m%d_%H%M%S")
         out_file = FEEDBACK / f"{role}_{ts}.md"
         out_file.write_text(
@@ -118,7 +113,7 @@ WYMAGANIA:
     except subprocess.TimeoutExpired:
         t = time.time() - start
         print(f"  [{role}] TIMEOUT ({t:.1f}s)", file=sys.stderr, flush=True)
-        return {"ok": False, "output": "[BLAD] Timeout (180s)", "model": short_model, "time": t}
+        return {"ok": False, "output": "[BLAD] Timeout (240s)", "model": short_model, "time": t}
     except Exception as e:
         t = time.time() - start
         print(f"  [{role}] EXCEPTION: {e}", file=sys.stderr, flush=True)
@@ -134,7 +129,7 @@ def list_agents():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Next.js Agent Delegator v4")
+    parser = argparse.ArgumentParser(description="Next.js Agent Delegator v5")
     parser.add_argument("--role", help="Rola agenta")
     parser.add_argument("--task", help="Zadanie")
     parser.add_argument("--model", default=None, help="Nadpisz model")
@@ -148,8 +143,19 @@ def main():
         list_agents()
         return
 
+    if args.test:
+        print("=== TEST 11 AGENTÓW ===", file=sys.stderr, flush=True)
+        ok_count = 0
+        for role in AGENTS:
+            r = run_agent(role, "Odpowiedz jednym slowem: OK", args.model)
+            status = "OK" if r["ok"] else f"FAIL ({r['time']:.1f}s)"
+            print(f"  {role:<18} {status}", file=sys.stderr, flush=True)
+            if r["ok"]: ok_count += 1
+        print(f"  => {ok_count}/{len(AGENTS)} gotowych", file=sys.stderr, flush=True)
+        return
+
     if args.all and args.task:
-        print(f"=== DELEGUJE DO WSZYSTKICH: {args.task[:60]}... ===")
+        print(f"=== DELEGUJE DO WSZYSTKICH: {args.task[:60]}... ===", file=sys.stderr, flush=True)
         for role in AGENTS:
             run_agent(role, args.task, args.model)
         return

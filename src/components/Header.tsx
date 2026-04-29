@@ -1,16 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useGamification } from "@/context/GamificationContext";
 import { getRankByPoints } from "@/lib/ranks";
 
-type NavLink = {
+interface NavLink {
   href: string;
   label: string;
   emoji: string;
-};
+}
 
 const NAV_LINKS: NavLink[] = [
   { href: "/", label: "Start", emoji: "🚀" },
@@ -23,6 +22,7 @@ const NAV_LINKS: NavLink[] = [
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { points } = useGamification();
   const currentRank = getRankByPoints(points);
@@ -32,42 +32,54 @@ export default function Header() {
     return pathname.startsWith(href);
   };
 
+  const handleNav = (href: string, e: React.MouseEvent) => {
+    // Close mobile menu
+    setMobileOpen(false);
+    // Explicit navigation as fallback
+    if (pathname !== href) {
+      router.push(href);
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-space-700/50 bg-space-900/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-space-700/50 bg-space-900/90 backdrop-blur-md">
       <nav
         className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6"
         aria-label="Nawigacja galaktyczna"
       >
         <div className="flex items-center gap-10">
           {/* Brand */}
-          <Link
+          <a
             href="/"
-            className="flex items-center gap-2 font-display text-xs text-quasar glow-text hover:scale-105 transition-transform"
+            onClick={(e) => handleNav("/", e)}
+            className="flex items-center gap-2 font-display text-xs text-quasar glow-text hover:scale-105 transition-transform cursor-pointer"
           >
             <span className="text-base">👽</span>
             POSITIVE ALIEN
-          </Link>
+          </a>
 
           {/* Ranga */}
-          <Link
+          <a
             href="/leaderboard"
-            className="hidden sm:flex items-center gap-1.5 bg-space-800/80 border border-walszak/40 px-4 py-2 rounded-full hover:border-walszak hover:shadow-[0_0_12px_rgba(236,72,153,0.3)] transition-all"
+            onClick={(e) => handleNav("/leaderboard", e)}
+            className="hidden sm:flex items-center gap-1.5 bg-space-800/80 border border-walszak/40 px-4 py-2 rounded-full hover:border-walszak hover:shadow-[0_0_12px_rgba(236,72,153,0.3)] transition-all cursor-pointer"
             title={currentRank.description}
           >
             <span className="text-base">👽</span>
             <span className="font-display text-xs text-walszak whitespace-nowrap">
               {currentRank.name}
             </span>
-          </Link>
+          </a>
         </div>
 
         {/* Desktop links */}
         <ul className="hidden md:flex items-center gap-12">
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
-              <Link
+              <a
                 href={link.href}
-                className={`relative px-4 py-2.5 font-display text-xs rounded-md transition-all duration-200 ${
+                onClick={(e) => handleNav(link.href, e)}
+                className={`relative px-4 py-2.5 font-display text-xs rounded-md transition-all duration-200 cursor-pointer ${
                   isActive(link.href)
                     ? "text-star bg-space-700/50 glow-text"
                     : "text-zinc-400 hover:text-quasar hover:bg-space-800/50"
@@ -79,7 +91,7 @@ export default function Header() {
                 {isActive(link.href) && (
                   <span className="absolute bottom-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-star animate-pulse" />
                 )}
-              </Link>
+              </a>
             </li>
           ))}
         </ul>
@@ -111,10 +123,10 @@ export default function Header() {
         <ul className="flex flex-col gap-1 px-4 pb-4 pt-1">
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
-              <Link
+              <a
                 href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-2 px-4 py-3 font-display text-xs rounded-lg transition-all ${
+                onClick={(e) => handleNav(link.href, e)}
+                className={`flex items-center gap-2 px-4 py-3 font-display text-xs rounded-lg transition-all cursor-pointer ${
                   isActive(link.href)
                     ? "bg-space-700 text-star"
                     : "text-zinc-400 hover:bg-space-800 hover:text-quasar"
@@ -122,7 +134,7 @@ export default function Header() {
               >
                 <span>{link.emoji}</span>
                 {link.label}
-              </Link>
+              </a>
             </li>
           ))}
         </ul>
