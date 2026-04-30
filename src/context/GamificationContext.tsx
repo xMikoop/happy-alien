@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 interface GamificationContextType {
   points: number;
@@ -19,20 +19,20 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
     setIsLoaded(true);
   }, []);
 
-  const addPoints = (amount: number) => {
+  const addPoints = useCallback((amount: number) => {
     setPoints(prev => {
       const newTotal = prev + amount;
       localStorage.setItem('cadence_points', newTotal.toString());
       return newTotal;
     });
-  };
+  }, []);
 
   return (
     <GamificationContext.Provider value={{ points, addPoints }}>
       {children}
     </GamificationContext.Provider>
   );
-};
+}
 
 export const useGamification = () => {
   const context = useContext(GamificationContext);

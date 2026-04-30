@@ -33,21 +33,20 @@ export default function Header() {
   };
 
   const handleNav = (href: string, e: React.MouseEvent) => {
-    // Close mobile menu
+    e.preventDefault(); // ZATRZYMAJ domyślny skok strony
     setMobileOpen(false);
-    // Explicit navigation as fallback
     if (pathname !== href) {
       router.push(href);
     }
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-space-700/50 bg-space-900/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full md:h-24 h-16 border-b border-space-700/50 bg-space-900/95 backdrop-blur-md flex items-center">
       <nav
-        className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6"
+        className="mx-auto w-full flex items-center justify-between px-6 sm:px-10"
         aria-label="Nawigacja galaktyczna"
       >
-        <div className="flex items-center gap-10">
+        <div className="flex items-center gap-10 flex-shrink-0">
           {/* Brand */}
           <a
             href="/"
@@ -73,24 +72,44 @@ export default function Header() {
         </div>
 
         {/* Desktop links */}
-        <ul className="hidden md:flex items-center gap-12">
+        <ul className="hidden xl:grid grid-cols-6 gap-2 flex-grow ml-12">
           {NAV_LINKS.map((link) => (
-            <li key={link.href}>
+            <li key={link.href} className="flex justify-center">
               <a
                 href={link.href}
                 onClick={(e) => handleNav(link.href, e)}
-                className={`relative px-4 py-2.5 font-display text-xs rounded-md transition-all duration-200 cursor-pointer ${
+                className={`w-full text-center py-2.5 font-display text-[10px] rounded-md transition-all duration-200 cursor-pointer ${
                   isActive(link.href)
                     ? "text-star bg-space-700/50 glow-text"
                     : "text-zinc-400 hover:text-quasar hover:bg-space-800/50"
                 }`}
                 aria-current={isActive(link.href) ? "page" : undefined}
               >
-                <span className="mr-1.5">{link.emoji}</span>
-                {link.label}
+                <span className="block mb-1 text-base">{link.emoji}</span>
+                <span className="block truncate">{link.label}</span>
                 {isActive(link.href) && (
-                  <span className="absolute bottom-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-star animate-pulse" />
+                  <div className="mx-auto h-0.5 w-8 rounded-full bg-star animate-pulse mt-1" />
                 )}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        {/* Fallback dla mniejszych ekranów MD/LG */}
+        <ul className="hidden md:flex xl:hidden items-center justify-end flex-grow gap-x-6 ml-8">
+          {NAV_LINKS.map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                onClick={(e) => handleNav(link.href, e)}
+                className={`relative px-3 py-2 font-display text-[9px] rounded-md transition-all duration-200 cursor-pointer ${
+                  isActive(link.href)
+                    ? "text-star bg-space-700/50 glow-text"
+                    : "text-zinc-400 hover:text-quasar hover:bg-space-800/50"
+                }`}
+                aria-current={isActive(link.href) ? "page" : undefined}
+              >
+                {link.emoji} {link.label}
               </a>
             </li>
           ))}

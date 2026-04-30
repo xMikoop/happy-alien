@@ -1,6 +1,7 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 const PAGE_NAMES: Record<string, string> = {
   "/": "Start",
@@ -13,16 +14,21 @@ const PAGE_NAMES: Record<string, string> = {
 
 export default function Breadcrumb() {
   const pathname = usePathname();
+  const router = useRouter();
 
   if (pathname === "/") return null;
 
   const segments = pathname.split("/").filter(Boolean);
 
   return (
-    <nav className="sticky top-14 z-40 border-b border-space-700/50 bg-space-900/90 backdrop-blur-md px-4 py-2.5" aria-label="Breadcrumb">
+    <nav className="absolute top-16 left-0 right-0 z-40 border-b border-space-700/30 bg-space-900/60 backdrop-blur-sm px-4 py-2" aria-label="Breadcrumb">
       <ol className="mx-auto flex max-w-6xl items-center gap-2 text-sm">
         <li>
-          <a href="/" onClick={() => window.location.href='/'} className="font-display text-xs text-quasar hover:text-star transition-colors px-2 py-1 rounded hover:bg-space-800/50">
+          <a 
+            href="/" 
+            onClick={(e) => { e.preventDefault(); router.push("/"); }} 
+            className="font-display text-[10px] text-quasar hover:text-star transition-colors px-2 py-1 rounded hover:bg-space-800/50"
+          >
             👽 Start
           </a>
         </li>
@@ -34,9 +40,13 @@ export default function Breadcrumb() {
             <li key={href} className="flex items-center gap-2">
               <span className="text-zinc-600">/</span>
               {isLast ? (
-                <span className="font-display text-xs text-star px-2 py-1">{name}</span>
+                <span className="font-display text-[10px] text-star px-2 py-1">{name}</span>
               ) : (
-                <a href={href} onClick={() => window.location.href=href} className="font-display text-xs text-zinc-400 hover:text-quasar transition-colors px-2 py-1 rounded hover:bg-space-800/50">
+                <a 
+                  href={href} 
+                  onClick={(e) => { e.preventDefault(); router.push(href); }} 
+                  className="font-display text-[10px] text-zinc-400 hover:text-quasar transition-colors px-2 py-1 rounded hover:bg-space-800/50"
+                >
                   {name}
                 </a>
               )}

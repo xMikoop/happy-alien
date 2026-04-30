@@ -28,7 +28,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <GalaxyBackground />
           <Header />
           <Breadcrumb />
-          {children}
+          <main className="pt-24 md:pt-32">
+            {children}
+          </main>
           <Footer />
           <AlienMentor />
         </GamificationProvider>
